@@ -1,5 +1,7 @@
 # shacl-semantic-lp-datasets
 
+Link prediction datasets based on the YAGO3-10, NELL-995, and DB100k standard link prediction datasets, enriched with RDFS semantics and SHACL shapes.
+
 ## Description 
 
 Link prediction datasets based on the YAGO3-10, NELL-995, and DB100k standard link prediction datasets.
