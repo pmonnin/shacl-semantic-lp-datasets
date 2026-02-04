@@ -370,3 +370,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,linux,macos,windows,pycharm+all,sublimetext
 
+data/**/*.ttl
