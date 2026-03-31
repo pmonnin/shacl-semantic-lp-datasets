@@ -72,7 +72,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
     * See the ``validate_graph.py`` Python script to compute validation reports on the datasets
     * Take into account that it generates two validation reports: one with safe IRIs, and one with original IRIs (especially useful for the YAGO3-10+ dataset that contains ``"`` in IRIs)
     * See [``validate_graph_all.sh``](validate_graph_all.sh)
-8. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets
+8. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets and extract the non-conformant nodes for each dataset
     * See the ``validation_reports_statistics.py`` Python script to get statistics about the validation reports 
     * See [``validation_reports_statistics_all.sh``](validation_reports_statistics_all.sh)``
     * For YAGO3-10+, it is necessary to use safe IRIs to compute the statistics

@@ -1,3 +1,5 @@
+import pickle
+
 import argparse
 import rdflib
 
@@ -9,7 +11,13 @@ def main():
     parser.add_argument("--report-full", dest="report_full_file", help="Validation report file on full dataset", required=True)
     parser.add_argument("--report-train", dest="report_train_file", help="Validation report file on train dataset", required=True)
     parser.add_argument("--report-train-val", dest="report_train_val_file", help="Validation report file on train+val dataset", required=True)
-    parser.add_argument("--output", dest="output", help="Output file", required=True)
+    parser.add_argument("--output-md", dest="output_md", help="Output Markdown file", required=True)
+    parser.add_argument("--output-nc-nodes-full", dest="output_nc_nodes_full",
+                        help="Output file for non-conformant nodes of the full dataset", required=True)
+    parser.add_argument("--output-nc-nodes-train", dest="output_nc_nodes_train",
+                        help="Output file for non-conformant nodes of the train dataset", required=True)
+    parser.add_argument("--output-nc-nodes-train-val", dest="output_nc_nodes_train_val",
+                        help="Output file for non-conformant nodes of the train+val dataset", required=True)
     parser.add_argument("-l,--log-level", dest="log_level", help="Set the logging level", type=str,
                         default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     args = parser.parse_args()
@@ -45,20 +53,48 @@ def main():
     train_non_conformant_nodes = {row["node"] for row in report_train_graph.query(non_conformant_nodes_query)}
     train_val_non_conformant_nodes = {row["node"] for row in report_train_val_graph.query(non_conformant_nodes_query)}
 
+    # Intersections
+    full_and_train = full_non_conformant_nodes & train_non_conformant_nodes
+    full_and_train_val = full_non_conformant_nodes & train_val_non_conformant_nodes
+    train_and_train_val = train_non_conformant_nodes & train_val_non_conformant_nodes
+    all_three = full_non_conformant_nodes & train_non_conformant_nodes & train_val_non_conformant_nodes
+
+    # Exclusive to each set
+    only_full = full_non_conformant_nodes - train_non_conformant_nodes - train_val_non_conformant_nodes
+    only_train = train_non_conformant_nodes - full_non_conformant_nodes - train_val_non_conformant_nodes
+    only_train_val = train_val_non_conformant_nodes - full_non_conformant_nodes - train_non_conformant_nodes
+
+    # Fixed
+    fixed_train_full = train_non_conformant_nodes - full_non_conformant_nodes
+    fixed_train_val_full = train_val_non_conformant_nodes - full_non_conformant_nodes
+
     logger.info("Compute and write statistics")
-    with open(args.output, "w") as f:
-        f.write("# Validation report statistics\n")
+    with open(args.output_md, "w") as f:
+        f.write("# Validation report statistics\n\n")
+
+        f.write("## Base counts\n")
         f.write(f"* Full dataset non-conformant nodes: {len(full_non_conformant_nodes)}\n")
         f.write(f"* Train dataset non-conformant nodes: {len(train_non_conformant_nodes)}\n")
-        f.write(f"* Train+val dataset non-conformant nodes: {len(train_val_non_conformant_nodes)}\n")
+        f.write(f"* Train+val dataset non-conformant nodes: {len(train_val_non_conformant_nodes)}\n\n")
 
-        train_fixed_nodes = train_non_conformant_nodes - full_non_conformant_nodes
-        f.write(f"* Train un-conformant nodes that are conformant in full: {len(train_fixed_nodes)}\n")
+        f.write("## Intersections\n")
+        f.write(f"* Full ∩ Train: {len(full_and_train)}\n")
+        f.write(f"* Full ∩ Train+val: {len(full_and_train_val)}\n")
+        f.write(f"* Train ∩ Train+val: {len(train_and_train_val)}\n")
+        f.write(f"* Full ∩ Train ∩ Train+val: {len(all_three)}\n\n")
 
-        train_val_fixed_nodes = train_val_non_conformant_nodes - full_non_conformant_nodes
-        f.write(f"* Train+val un-conformant nodes that are conformant in full: {len(train_val_fixed_nodes)}\n")
+        f.write("## Exclusive non-conformant nodes\n")
+        f.write(f"* Only in Full: {len(only_full)}\n")
+        f.write(f"* Only in Train: {len(only_train)}\n")
+        f.write(f"* Only in Train+val: {len(only_train_val)}\n\n")
 
-    logger.info("validation_reports_statistics: done")
+        f.write("## Fixed nodes\n")
+        f.write(f"* Non-conformant in Train, conformant in Full: {len(fixed_train_full)}\n")
+        f.write(f"* Non-conformant in Train+val, conformant in Full: {len(fixed_train_val_full)}\n")
+
+    pickle.dump(full_non_conformant_nodes, open(args.output_nc_nodes_full, "wb"))
+    pickle.dump(train_non_conformant_nodes, open(args.output_nc_nodes_train, "wb"))
+    pickle.dump(train_val_non_conformant_nodes, open(args.output_nc_nodes_train_val, "wb"))
 
 
 if __name__ == '__main__':
