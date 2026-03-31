@@ -37,6 +37,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 * The ``reconstructed-datasets/`` folder contains: 
   * The full dataset grouping triples from the train/val/test splits and the TBox axioms
   * The train+TBox dataset
+  * The train+val+TBox dataset
 * The ``qse-shapes/`` folder contains the SHACL shapes mined by QSE on the full dataset, and their statistics 
 * The ``cleaned-shapes/`` folder contains the cleaned SHACL shapes and their statistics (removing shapes involving ``rdf:type`` paths)
 * The ``validation-reports/`` folder contains the validation reports and their statistics for the full dataset and the train+TBox dataset using original IRIs and safe IRIs (where invalid characters are URL encoded)
@@ -47,6 +48,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 2. Reconstruct the datasets
    * Full dataset merging train/val/test sets and TBox axioms
    * Only train set + TBox axioms
+   * Only train set + val set + TBox axioms
    * See the ``dataset_reconstruct.py`` Python script that groups all triples from the train/val (optional)/test (optional) splits and the TBox axioms
    * See [``dataset_reconstruct_all.sh``](dataset_reconstruct_all.sh)
    * See folders ``reconstructed-datasets/``
@@ -66,11 +68,11 @@ Datasets are available in the ``data/`` folder and are structured as follows:
     * See the ``shapes_statistics.py`` Python script to get statistics about the cleaned SHACL shapes 
     * See [``cleaned_shapes_statistics_all.sh``](cleaned_shapes_statistics_all.sh)
     * See folders ``cleaned-shapes/``
-7. Compute validation reports on full datasets and train+TBox datasets
+7. Compute validation reports on full datasets, train+TBox, and train+val+TBox datasets
     * See the ``validate_graph.py`` Python script to compute validation reports on the datasets
     * Take into account that it generates two validation reports: one with safe IRIs, and one with original IRIs (especially useful for the YAGO3-10+ dataset that contains ``"`` in IRIs)
     * See [``validate_graph_all.sh``](validate_graph_all.sh)
-8. Compute validation reports statistics on full datasets and train+TBox datasets
+8. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets
     * See the ``validation_reports_statistics.py`` Python script to get statistics about the validation reports 
     * See [``validation_reports_statistics_all.sh``](validation_reports_statistics_all.sh)``
     * For YAGO3-10+, it is necessary to use safe IRIs to compute the statistics
