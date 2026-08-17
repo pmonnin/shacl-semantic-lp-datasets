@@ -77,6 +77,11 @@ Datasets are available in the ``data/`` folder and are structured as follows:
     * See [``validation_reports_statistics_all.sh``](validation_reports_statistics_all.sh)``
     * For YAGO3-10+, it is necessary to use safe IRIs to compute the statistics
 
+## Requirements
+
+* Python 3.13
+* [requirements.txt](requirements.txt)
+
 ## References
 
 1. <span id=ref-1>Nicolas Robert, Pierre Monnin, Catherine Faron. Semantically Enriched Datasets for Link Prediction:
