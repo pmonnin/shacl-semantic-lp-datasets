@@ -87,4 +87,4 @@ Knowledge Graphs. Proc. VLDB Endow. 16(5): 1023-1032 (2023). [[paper]](https://w
 
 ## Funding acknowledgement
 
-These datasets are part of the [SHACKLE project](https://pmonnin.github.io/shackle.html) that has received funding from the European Union, via the oc2-2024-TES-02 issued and implemented by the ENFIELD project, under the grant agreement No 101120657. 
+These datasets are part of the [SHACKLE project](https://pmonnin.github.io/shackle.html) that has received funding from the European Union, via the oc2-2024-TES-02 call issued and implemented by the ENFIELD project, under the grant agreement No 101120657. 
