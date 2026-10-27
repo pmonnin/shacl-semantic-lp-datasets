@@ -86,7 +86,7 @@ python src/dataset_reconstruct.py \
   --ent2id data/YAGO3-10+/original-dataset/pickle/ent2id.pkl \
   --rel2id data/YAGO3-10+/original-dataset/pickle/rel2id.pkl \
   --class2id data/YAGO3-10+/original-dataset/pickle/class2id.pkl \
-  --output data/YAGO3-10+/reconstructed-datasets/train+schema_dataset.ttl
+  --output data/YAGO3-10+/reconstructed-datasets/full_dataset.ttl
 
 python src/dataset_reconstruct.py \
   --train-triples data/YAGO3-10+/original-dataset/train2id.txt \
