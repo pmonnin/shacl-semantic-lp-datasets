@@ -62,7 +62,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
    * See folders ``reconstructed-datasets/``
 4. Use [QSE](https://github.com/dkw-aau/qse) to mine SHACL shapes from the full datasets
    * Using a confidence of 0.8 and a support of 100
-   * Using a fixed version of QSE from the Wimmics team (Camille Juigné), not yet publicly available, vendored as [``vendor/qse-wimmics.jar``](vendor/qse-wimmics.jar) (QSE is distributed under the MIT license)
+   * Using a fixed version of QSE from the Wimmics team (provided by [Camille Juigné](https://cjuigne.github.io/cjuigne/)), not yet publicly available, vendored as [``vendor/qse-wimmics.jar``](vendor/qse-wimmics.jar) (QSE is distributed under the MIT license)
    * See the configuration files ``qse-shapes/qse_config.properties`` (one per dataset)
    * See [``qse_mine_all.sh``](qse_mine_all.sh)
    * See folders ``qse-shapes/``

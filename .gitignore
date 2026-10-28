@@ -373,3 +373,5 @@ $RECYCLE.BIN/
 data/**/*.ttl
 
 CLAUDE.md
+data/**/qse-output/
+vendor/qse-resources/
