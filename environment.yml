@@ -1,0 +1,10 @@
+name: shacl-semantic-lp-datasets
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pip
+  # Java runtime for vendor/qse-wimmics.jar
+  - openjdk=21
+  - pip:
+    - -r requirements.txt

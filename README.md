@@ -93,6 +93,8 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 * [requirements.txt](requirements.txt)
 * Java 21 (to run QSE)
 
+The [environment.yml](environment.yml) conda environment provides all of them: ``conda env create -f environment.yml``
+
 ## References
 
 1. <span id=ref-1>Nicolas Robert, Pierre Monnin, Catherine Faron. Semantically Enriched Datasets for Link Prediction:
