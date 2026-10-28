@@ -96,6 +96,9 @@ def main():
     logger = get_logger(args.log_level)
 
     logger.info("dataset_cleaning: start")
+    logger.info(f"Input dir: {args.input_dir}")
+    logger.info(f"Output dir: {args.output_dir}")
+    logger.info(f"IRI prefix: {args.iri_prefix if args.iri_prefix else 'none'}")
 
     input_dir = pathlib.Path(args.input_dir)
     output_dir = pathlib.Path(args.output_dir)
