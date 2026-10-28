@@ -34,6 +34,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
       * **observed_heads_original_kg** contains a tail/relation/head index of the dataset in the form of nested dictionaries using ids of entities and relations
       * **observed_tails_inv** is an equivalent of **observed_tails_original_kg** that also contains explicit modeling of inverse relations
       * **observed_heads_inv** is an equivalent of **observed_heads_original_kg** that also contains explicit modeling of inverse relations
+* The ``cleaned-dataset/`` folder has the same structure as ``original-dataset/`` and contains the cleaned original dataset (see [Re-building the datasets](#re-building-the-datasets))
 * The ``reconstructed-datasets/`` folder contains: 
   * The full dataset grouping triples from the train/val/test splits and the TBox axioms
   * The train+TBox dataset
@@ -45,34 +46,43 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 ## Re-building the datasets
 
 1. Download the [original datasets](https://zenodo.org/record/17438317)
-2. Reconstruct the datasets
+2. Clean the original datasets
+   * Values of the pickles linking ids to sets of ids (**inst_type**, **inst_type_all**, **classid2entid**, **subclassof2id**, **subclassof_all2id**, **rid2domid**, **rid2rangeid**) that are stored as lists are converted to sets, only when it is lossless (no duplicates and only int elements). In the original datasets, this concerns **classid2entid** in all datasets and **subclassof_all2id** in DB100k+
+   * In NELL-995+, entities, relations and classes do not have valid IRIs (e.g., ``concept:city:paris``, or coordinates such as ``48.59,-53.73``). They are prefixed with ``http://nell.example.org/`` (e.g., ``http://nell.example.org/concept:city:paris``) in **ent2id**, **rel2id** and **class2id**
+   * Dataset splits and other pickles are copied unchanged
+   * See the ``dataset_cleaning.py`` Python script that performs this cleaning procedure
+   * See [``dataset_cleaning_all.sh``](dataset_cleaning_all.sh)
+   * See folders ``cleaned-dataset/``
+3. Reconstruct the datasets from the cleaned datasets
    * Full dataset merging train/val/test sets and TBox axioms
    * Only train set + TBox axioms
    * Only train set + val set + TBox axioms
    * See the ``dataset_reconstruct.py`` Python script that groups all triples from the train/val (optional)/test (optional) splits and the TBox axioms
    * See [``dataset_reconstruct_all.sh``](dataset_reconstruct_all.sh)
    * See folders ``reconstructed-datasets/``
-3. Use [QSE](https://github.com/dkw-aau/qse) to mine SHACL shapes from the full datasets
+4. Use [QSE](https://github.com/dkw-aau/qse) to mine SHACL shapes from the full datasets
    * Using a confidence of 0.8 and a support of 100
-   * See configuration file [``qse_config.properties``](data/qse_config.properties)
+   * Using a fixed version of QSE from the Wimmics team (Camille Juigné), not yet publicly available, vendored as [``vendor/qse-wimmics.jar``](vendor/qse-wimmics.jar) (QSE is distributed under the MIT license)
+   * See the configuration files ``qse-shapes/qse_config.properties`` (one per dataset)
+   * See [``qse_mine_all.sh``](qse_mine_all.sh)
    * See folders ``qse-shapes/``
-4. Compute statistics on the mined shapes
+5. Compute statistics on the mined shapes
    * See the ``shapes_statistics.py`` Python script to get statistics about the mined SHACL shapes 
    * See [``qse_shapes_statistics_all.sh``](qse_shapes_statistics_all.sh)
    * See folders ``qse-shapes/``
-5. Clean shapes by removing those involving ``rdf:type`` paths (and iteratively, those that are empty after that)
+6. Clean shapes by removing those involving ``rdf:type`` paths (and iteratively, those that are empty after that)
     * See the ``shapes_cleaning.py`` Python script that performs this cleaning procedure
     * See [``qse_shapes_cleaning_all.sh``](qse_shapes_cleaning_all.sh)
     * See folders ``cleaned-shapes/``
-6. Compute statistics on the mined shapes
+7. Compute statistics on the mined shapes
     * See the ``shapes_statistics.py`` Python script to get statistics about the cleaned SHACL shapes 
     * See [``cleaned_shapes_statistics_all.sh``](cleaned_shapes_statistics_all.sh)
     * See folders ``cleaned-shapes/``
-7. Compute validation reports on full datasets, train+TBox, and train+val+TBox datasets
+8. Compute validation reports on full datasets, train+TBox, and train+val+TBox datasets
     * See the ``validate_graph.py`` Python script to compute validation reports on the datasets
     * Take into account that it generates two validation reports: one with safe IRIs, and one with original IRIs (especially useful for the YAGO3-10+ dataset that contains ``"`` in IRIs)
     * See [``validate_graph_all.sh``](validate_graph_all.sh)
-8. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets and extract the non-conformant nodes for each dataset
+9. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets and extract the non-conformant nodes for each dataset
     * See the ``validation_reports_statistics.py`` Python script to get statistics about the validation reports 
     * See [``validation_reports_statistics_all.sh``](validation_reports_statistics_all.sh)``
     * For YAGO3-10+, it is necessary to use safe IRIs to compute the statistics
@@ -81,6 +91,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 
 * Python 3.13
 * [requirements.txt](requirements.txt)
+* Java 21 (to run QSE)
 
 ## References
 
