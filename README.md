@@ -65,6 +65,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
    * Using a fixed version of QSE from the Wimmics team (provided by [Camille Juigné](https://cjuigne.github.io/cjuigne/)), not yet publicly available, vendored as [``vendor/qse-wimmics.jar``](vendor/qse-wimmics.jar) (QSE is distributed under the MIT license)
    * See the configuration files ``qse-shapes/qse_config.properties`` (one per dataset)
    * See [``qse_mine_all.sh``](qse_mine_all.sh)
+   * See also [``qse_mine_all_ram_510heap.sh``](qse_mine_all_ram_510heap.sh), which runs QSE in RAM (``/dev/shm``) with a 510 GB heap, to avoid QSE's heavy I/O on network filesystems (used for YAGO3-10+)
    * See folders ``qse-shapes/``
 5. Compute statistics on the mined shapes
    * See the ``shapes_statistics.py`` Python script to get statistics about the mined SHACL shapes 
