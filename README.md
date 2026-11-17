@@ -41,7 +41,9 @@ Datasets are available in the ``data/`` folder and are structured as follows:
   * The train+val+TBox dataset
 * The ``qse-shapes/`` folder contains the SHACL shapes mined by QSE on the full dataset, and their statistics 
 * The ``cleaned-shapes/`` folder contains the cleaned SHACL shapes and their statistics (removing shapes involving ``rdf:type`` paths)
-* The ``validation-reports/`` folder contains the validation reports and their statistics for the full dataset and the train+TBox dataset using original IRIs and safe IRIs (where invalid characters are URL encoded)
+* The ``validation-reports/`` folder contains:
+  * The validation reports and their statistics for the full dataset, the train+TBox dataset and the train+val+TBox dataset, using safe IRIs (where invalid characters are URL encoded)
+  * **iri_map** linking each IRI that was encoded to its safe IRI (IRIs that are not in this dictionary are unchanged)
 
 ## Re-building the datasets
 
@@ -49,6 +51,8 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 2. Clean the original datasets
    * Values of the pickles linking ids to sets of ids (**inst_type**, **inst_type_all**, **classid2entid**, **subclassof2id**, **subclassof_all2id**, **rid2domid**, **rid2rangeid**) that are stored as lists are converted to sets, only when it is lossless (no duplicates and only int elements). In the original datasets, this concerns **classid2entid** in all datasets and **subclassof_all2id** in DB100k+
    * In NELL-995+, entities, relations and classes do not have valid IRIs (e.g., ``concept:city:paris``, or coordinates such as ``48.59,-53.73``). They are prefixed with ``http://nell.example.org/`` (e.g., ``http://nell.example.org/concept:city:paris``) in **ent2id**, **rel2id** and **class2id**
+   * In DB100k+, IRIs are wrapped in angle brackets in **ent2id**, **rel2id** and **class2id** (e.g., ``<http://dbpedia.org/resource/Paris>``). These brackets are removed so that all datasets use bare IRIs
+   * In DB100k+, 8 entities do not have absolute IRIs (``unk``, ``?autoplay=true``, ``listen.pls``, ``index.html``, ``en``, ``index.php``, ``www.monolithgraphics.com``, ``player.html``). They are prefixed with ``http://db100k.example.org/`` (e.g., ``http://db100k.example.org/unk``).
    * Dataset splits and other pickles are copied unchanged
    * See the ``dataset_cleaning.py`` Python script that performs this cleaning procedure
    * See [``dataset_cleaning_all.sh``](dataset_cleaning_all.sh)
@@ -81,12 +85,11 @@ Datasets are available in the ``data/`` folder and are structured as follows:
     * See folders ``cleaned-shapes/``
 8. Compute validation reports on full datasets, train+TBox, and train+val+TBox datasets
     * See the ``validate_graph.py`` Python script to compute validation reports on the datasets
-    * Take into account that it generates two validation reports: one with safe IRIs, and one with original IRIs (especially useful for the YAGO3-10+ dataset that contains ``"`` in IRIs)
+    * Take into account that validation reports use safe IRIs, as some IRIs are invalid (e.g., the YAGO3-10+ dataset contains ``"`` in IRIs). The **iri_map** dictionary links each original IRI that was encoded to its safe IRI. To move from safe IRIs back to the original ones, invert it (the encoding is injective) and leave IRIs that are not in it unchanged, e.g., ``safe2iri = {v: k for k, v in iri_map.items()}`` then ``safe2iri.get(safe_iri, safe_iri)``
     * See [``validate_graph_all.sh``](validate_graph_all.sh)
 9. Compute validation reports statistics on full datasets, train+TBox, train+val+TBox datasets and extract the non-conformant nodes for each dataset
     * See the ``validation_reports_statistics.py`` Python script to get statistics about the validation reports 
     * See [``validation_reports_statistics_all.sh``](validation_reports_statistics_all.sh)``
-    * For YAGO3-10+, it is necessary to use safe IRIs to compute the statistics
 
 ## Requirements
 
