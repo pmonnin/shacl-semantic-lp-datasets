@@ -67,6 +67,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
 4. Use [QSE](https://github.com/dkw-aau/qse) to mine SHACL shapes from the full datasets
    * Using a confidence of 0.8 and a support of 100
    * Using a fixed version of QSE from the Wimmics team (provided by [Camille Juigné](https://cjuigne.github.io/cjuigne/)), not yet publicly available, vendored as [``vendor/qse-wimmics.jar``](vendor/qse-wimmics.jar) (QSE is distributed under the MIT license)
+   * Shape IRIs include the dataset name (``annotate_dataset_in_shape_name=true``) so that shapes of different datasets do not collide
    * See the configuration files ``qse-shapes/qse_config.properties`` (one per dataset)
    * See [``qse_mine_all.sh``](qse_mine_all.sh)
    * See also [``qse_mine_all_ram_510heap.sh``](qse_mine_all_ram_510heap.sh), which runs QSE in RAM (``/dev/shm``) with a 510 GB heap, to avoid QSE's heavy I/O on network filesystems (used for YAGO3-10+)

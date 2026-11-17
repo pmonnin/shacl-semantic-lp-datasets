@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Same as qse_mine_all.sh, but QSE reads its config and query files and writes its output on a fast local filesystem.
-# QSE reopens the config file for each property shape and writes its shapes to an RDF4J store (db_default) in its
-# output folder, which takes hours on a network filesystem (e.g., YAGO3-10+).
+# Same as qse_mine_all.sh, but QSE reads its query files and writes its output on a fast local filesystem.
+# QSE writes its shapes to RDF4J stores (db_*) in its output folder, which takes hours on a network filesystem
+# (e.g., YAGO3-10+).
 
 QSE_JAR=vendor/qse-wimmics.jar
 
@@ -24,8 +24,9 @@ echo "QSE working dir: $WORK_DIR"
 # QSE reads its SPARQL query files from resources_path on disk, so extract them from the jar
 unzip -o -q $QSE_JAR 'queries/*' 'shacl_queries/*' 'shacl_stats_queries/*' 'stats/*' -d "$WORK_DIR/qse-resources"
 
-# Run QSE with a copy of the dataset config whose output_file_path and resources_path point to the working dir, then
-# copy its output back to qse-output/ (except the db_* RDF4J stores, which are only intermediate)
+# QSE only takes paths from its config (no overrides, no $VAR expansion), so run it with a copy of the dataset config
+# whose output_file_path and resources_path point to the working dir, then copy its output back to qse-output/
+# (except the db_* RDF4J stores, which are only intermediate)
 run_qse() {
   local dataset_dir=$1
   local dataset_name=$2
