@@ -30,7 +30,7 @@ def load_convert_type_triples(file_path: str, id2ent: dict[int, str], id2class: 
     axioms = pickle.load(open(file_path, "rb"))
     for k, v in tqdm.tqdm(axioms.items()):
         for v2 in v:
-            triples.append((id2ent[k], "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", id2class[v2]))
+            triples.append((id2ent[k], "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", id2class[v2]))
     return triples
 
 
@@ -39,7 +39,7 @@ def load_convert_subclass_triples(file_path: str, id2class: dict[int, str]) -> l
     axioms = pickle.load(open(file_path, "rb"))
     for k, v in tqdm.tqdm(axioms.items()):
         for v2 in v:
-            triples.append((id2class[k], "<http://www.w3.org/2000/01/rdf-schema#subClassOf>", id2class[v2]))
+            triples.append((id2class[k], "http://www.w3.org/2000/01/rdf-schema#subClassOf", id2class[v2]))
     return triples
 
 
@@ -48,23 +48,21 @@ def load_convert_relation_schema_triples(file_path: str, id2rel: dict[int, str],
     axioms = pickle.load(open(file_path, "rb"))
     for k, v in tqdm.tqdm(axioms.items()):
         for v2 in v:
-            triples.append((id2rel[k], f"<http://www.w3.org/2000/01/rdf-schema#{axiom_type}>", id2class[v2]))
+            triples.append((id2rel[k], f"http://www.w3.org/2000/01/rdf-schema#{axiom_type}", id2class[v2]))
     return triples
 
 
-def clean_uri(uri: str) -> str:
-    if not uri.startswith("<"):
-        uri = f"<{uri}"
-    if not uri.endswith(">"):
-        uri = f"{uri}>"
-    return uri
+def format_iri(iri: str) -> str:
+    assert not iri.startswith("<") and not iri.endswith(">"), \
+        f"IRI with angle brackets (run dataset_cleaning.py first): {iri}"
+    return f"<{iri}>"
 
 
-def clean_triples(triples: list[tuple[str, str, str]]):
-    cleaned_triples = []
+def format_triples(triples: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
+    formatted_triples = []
     for t in tqdm.tqdm(triples):
-        cleaned_triples.append((clean_uri(t[0]), clean_uri(t[1]), clean_uri(t[2])))
-    return cleaned_triples
+        formatted_triples.append((format_iri(t[0]), format_iri(t[1]), format_iri(t[2])))
+    return formatted_triples
 
 
 def main():
@@ -141,14 +139,14 @@ def main():
     full_triples = train_triples + val_triples + test_triples + type_triples + sub_triples + domain_triples + range_triples
     logger.info(f"Total number of triples: {len(full_triples)}")
 
-    # Clean triples (update malformed entities)
-    logger.info("Clean triples")
-    cleaned_triples = clean_triples(full_triples)
+    # Format IRIs as N-Triples
+    logger.info("Format triples")
+    formatted_triples = format_triples(full_triples)
 
-    # Save cleaned triples
-    logger.info(f"Save cleaned triples to {args.output}")
+    # Save formatted triples
+    logger.info(f"Save formatted triples to {args.output}")
     with open(args.output, "w") as f:
-        for t in cleaned_triples:
+        for t in formatted_triples:
             f.write(f"{t[0]}\t{t[1]}\t{t[2]} .\n")
 
     logger.info("dataset_reconstruct: done")

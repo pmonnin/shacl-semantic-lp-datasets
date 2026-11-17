@@ -56,13 +56,38 @@ def fix_set_mapping(mapping: dict[int, set[int] | list], file_name: str,
     return mapping
 
 
+def strip_iri_brackets(mapping: dict[str, int], file_name: str, logger: logging.Logger) -> dict[str, int]:
+    """
+    Remove the angle brackets around IRIs (e.g., <http://dbpedia.org/resource/Paris>) so that all datasets use bare
+    IRIs. The input mapping is not modified.
+    :param mapping: mapping from an IRI (with or without angle brackets) to an id
+    :param file_name: name of the pickle file the mapping comes from, used in log messages
+    :param logger: logger used to report the number of stripped IRIs
+    :return: a new mapping from the bare IRIs to the same ids
+    """
+    stripped_mapping = {}
+    stripped_count = 0
+
+    for k, v in tqdm.tqdm(mapping.items()):
+        if k.startswith("<") and k.endswith(">"):
+            k = k[1:-1]
+            stripped_count += 1
+        stripped_mapping[k] = v
+
+    assert len(stripped_mapping) == len(mapping)
+
+    logger.info(f"{file_name}: removed angle brackets from {stripped_count}/{len(mapping)} IRIs")
+    return stripped_mapping
+
+
 def prefix_iri_mapping(mapping: dict[str, int], file_name: str, iri_prefix: str, logger: logging.Logger) -> dict[str, int]:
     """
-    Prefix every IRI with iri_prefix (IRIs already starting with it are left untouched). The input mapping is not
+    Prefix with iri_prefix every IRI that is not absolute, i.e., that does not contain "://" (e.g., concept:city:paris
+    or index.html). Absolute IRIs, including those already prefixed, are left untouched. The input mapping is not
     modified.
     :param mapping: mapping from an IRI to an id
     :param file_name: name of the pickle file the mapping comes from, used in log messages
-    :param iri_prefix: prefix added in front of each IRI
+    :param iri_prefix: prefix added in front of each IRI that is not absolute
     :param logger: logger used to report the number of prefixed IRIs
     :return: a new mapping from the prefixed IRIs to the same ids
     """
@@ -70,7 +95,7 @@ def prefix_iri_mapping(mapping: dict[str, int], file_name: str, iri_prefix: str,
     prefixed_count = 0
 
     for k, v in tqdm.tqdm(mapping.items()):
-        if not k.startswith(iri_prefix):
+        if "://" not in k:
             k = f"{iri_prefix}{k}"
             prefixed_count += 1
         prefixed_mapping[k] = v
@@ -83,11 +108,13 @@ def prefix_iri_mapping(mapping: dict[str, int], file_name: str, iri_prefix: str,
 
 def main():
     parser = argparse.ArgumentParser(prog="dataset_cleaning", description="Clean an original dataset: convert list "
-                                                                          "values of mapping pickles to sets and "
-                                                                          "optionally prefix IRIs")
+                                                                          "values of mapping pickles to sets, remove "
+                                                                          "angle brackets around IRIs and optionally "
+                                                                          "prefix IRIs")
     parser.add_argument("--input-dir", dest="input_dir", help="Original dataset folder", required=True)
     parser.add_argument("--output-dir", dest="output_dir", help="Cleaned dataset folder", required=True)
-    parser.add_argument("--iri-prefix", dest="iri_prefix", help="Prefix added to entity, relation and class IRIs",
+    parser.add_argument("--iri-prefix", dest="iri_prefix", help="Prefix added to entity, relation and class IRIs "
+                                                                     "that are not absolute",
                         required=False)
     parser.add_argument("-l,--log-level", dest="log_level", help="Set the logging level", type=str,
                         default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
@@ -116,9 +143,11 @@ def main():
             mapping = fix_set_mapping(pickle.load(open(f, "rb")), f.name, logger)
             pickle.dump(mapping, open(output_dir / "pickle" / f.name, "wb"))
 
-        elif f.name in IRI_MAPPING_FILES and args.iri_prefix:
-            logger.info(f"Prefix IRIs in {f.name}")
-            mapping = prefix_iri_mapping(pickle.load(open(f, "rb")), f.name, args.iri_prefix, logger)
+        elif f.name in IRI_MAPPING_FILES:
+            logger.info(f"Normalize IRIs in {f.name}")
+            mapping = strip_iri_brackets(pickle.load(open(f, "rb")), f.name, logger)
+            if args.iri_prefix:
+                mapping = prefix_iri_mapping(mapping, f.name, args.iri_prefix, logger)
             pickle.dump(mapping, open(output_dir / "pickle" / f.name, "wb"))
 
         else:

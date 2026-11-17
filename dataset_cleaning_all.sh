@@ -3,7 +3,8 @@
 # DB100k+
 python src/dataset_cleaning.py \
   --input-dir data/DB100k+/original-dataset \
-  --output-dir data/DB100k+/cleaned-dataset
+  --output-dir data/DB100k+/cleaned-dataset \
+  --iri-prefix http://db100k.example.org/
 
 # NELL-995+
 python src/dataset_cleaning.py \
