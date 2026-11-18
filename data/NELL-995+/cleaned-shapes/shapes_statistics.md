@@ -14,9 +14,9 @@
 
 ## Details on PropertyShapes constraints
 * List of constraints (top-level, not nested):
+  * http://www.w3.org/ns/shacl#or: 4
   * http://www.w3.org/ns/shacl#class: 9
   * http://www.w3.org/ns/shacl#nodeKind: 9
-  * http://www.w3.org/ns/shacl#or: 4
   * http://www.w3.org/ns/shacl#maxCount: 1
 * Details on paths
   * Number of paths: 13

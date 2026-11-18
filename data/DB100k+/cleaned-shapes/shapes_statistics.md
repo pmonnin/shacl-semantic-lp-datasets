@@ -1,7 +1,7 @@
 # SHACL shapes statistics:
 
 ## File statistics
-* Number of triples: 459
+* Number of triples: 438
 
 ## Shapes statistics
 * Total shapes: 87
