@@ -40,7 +40,7 @@ Datasets are available in the ``data/`` folder and are structured as follows:
   * The train+TBox dataset
   * The train+val+TBox dataset
 * The ``qse-shapes/`` folder contains the SHACL shapes mined by QSE on the full dataset, and their statistics 
-* The ``cleaned-shapes/`` folder contains the cleaned SHACL shapes and their statistics (removing shapes involving ``rdf:type`` paths)
+* The ``cleaned-shapes/`` folder contains the cleaned SHACL shapes and their statistics (removing ``rdf:type`` paths and ``sh:node`` constraints, see [Re-building the datasets](#re-building-the-datasets))
 * The ``validation-reports/`` folder contains:
   * The validation reports and their statistics for the full dataset, the train+TBox dataset and the train+val+TBox dataset, using safe IRIs (where invalid characters are URL encoded)
   * **iri_map** linking each IRI that was encoded to its safe IRI (IRIs that are not in this dictionary are unchanged)
@@ -76,10 +76,25 @@ Datasets are available in the ``data/`` folder and are structured as follows:
    * See the ``shapes_statistics.py`` Python script to get statistics about the mined SHACL shapes 
    * See [``qse_shapes_statistics_all.sh``](qse_shapes_statistics_all.sh)
    * See folders ``qse-shapes/``
-6. Clean shapes by removing those involving ``rdf:type`` paths (and iteratively, those that are empty after that)
+6. Clean shapes
+    * Remove ``rdf:type`` paths: PropertyShapes whose only path is ``rdf:type`` are removed, the others only lose their ``rdf:type`` path. NodeShapes left without constraints are then removed (see below)
+    * Remove ``sh:node`` constraints (see below)
     * See the ``shapes_cleaning.py`` Python script that performs this cleaning procedure
     * See [``qse_shapes_cleaning_all.sh``](qse_shapes_cleaning_all.sh)
     * See folders ``cleaned-shapes/``
+
+> [!IMPORTANT]
+> **Cleaned shapes do not contain ``rdf:type`` paths.**
+> Link prediction models only predict triples between entities, not ``rdf:type`` triples.
+> Constraints on ``rdf:type`` paths cannot be affected by predictions and are therefore of no use to assess them.
+>
+> **Cleaned shapes do not contain ``sh:node`` constraints.**
+> QSE adds ``sh:node <NodeShape of C>`` next to each ``sh:class C`` constraint, which requires each object of the property to also conform to the shape of ``C``, whose own ``sh:node`` constraints apply to its objects, and so on along the graph.
+> With such constraints, a single violation makes all the nodes that link to the violating node, directly or through a chain of links, non-conformant as well.
+> As these datasets are meant for link prediction, validation reports should reflect, for each node, the violations caused by its own triples, so that the effect of adding or removing a triple on validation can be measured precisely, without inflating the number of non-conformant nodes.
+> Removing ``sh:node`` constraints also avoids pyshacl failing with ``Validation path too deep!`` on YAGO3-10+, where entities are linked along long chains of shapes that reference each other.
+> No type check is lost: ``sh:class`` still checks the classes of the nodes a node links to, and each node is still validated against the shapes of its own classes (``sh:targetClass``).
+
 7. Compute statistics on the mined shapes
     * See the ``shapes_statistics.py`` Python script to get statistics about the cleaned SHACL shapes 
     * See [``cleaned_shapes_statistics_all.sh``](cleaned_shapes_statistics_all.sh)

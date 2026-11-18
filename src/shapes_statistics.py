@@ -70,6 +70,15 @@ def get_number_rdf_type_paths(graph):
     return len(list(graph.triples((None, SH.path, rdflib.RDF.type))))
 
 
+def get_node_constraints_stats(graph, node_shapes, property_shapes):
+    node_triples = list(graph.triples((None, SH.node, None)))
+    on_node_shapes = sum(1 for s, _, _ in node_triples if s in node_shapes)
+    on_property_shapes = sum(1 for s, _, _ in node_triples if s in property_shapes)
+    nested = len(node_triples) - on_node_shapes - on_property_shapes
+    referenced_shapes = {o for _, _, o in node_triples}
+    return len(node_triples), on_node_shapes, on_property_shapes, nested, len(referenced_shapes)
+
+
 def list_shape_constraints(graph, shapes, excluded_properties):
     counter = collections.Counter()
 
@@ -126,6 +135,14 @@ def main():
         f.write(f"  * Number of paths: {total_paths}\n")
         f.write(f"  * Number of rdf:type paths: {type_paths} ({(type_paths / total_paths * 100):.2f} %)\n")
         f.write(f"  * Number of other paths: {total_paths - type_paths} ({((total_paths - type_paths) / total_paths * 100):.2f} %)\n")
+
+        f.write("\n## Details on sh:node constraints\n")
+        total_nodes, on_ns, on_ps, nested, referenced = get_node_constraints_stats(g, node_shapes, property_shapes)
+        f.write(f"* Number of sh:node constraints (top-level and nested): {total_nodes}\n")
+        f.write(f"  * On NodeShapes: {on_ns}\n")
+        f.write(f"  * On PropertyShapes: {on_ps}\n")
+        f.write(f"  * Nested (e.g., in sh:or): {nested}\n")
+        f.write(f"* Number of distinct shapes referenced by sh:node: {referenced}\n")
 
     logger.info("shapes_statistics: done")
 

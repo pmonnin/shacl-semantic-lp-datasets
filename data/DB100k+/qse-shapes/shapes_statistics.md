@@ -14,12 +14,19 @@
 
 ## Details on PropertyShapes constraints
 * List of constraints (top-level, not nested):
-  * http://www.w3.org/ns/shacl#maxCount: 6
-  * http://www.w3.org/ns/shacl#minCount: 1
-  * http://www.w3.org/ns/shacl#nodeKind: 53
   * http://www.w3.org/ns/shacl#in: 75
   * http://www.w3.org/ns/shacl#class: 32
+  * http://www.w3.org/ns/shacl#maxCount: 6
+  * http://www.w3.org/ns/shacl#nodeKind: 53
+  * http://www.w3.org/ns/shacl#minCount: 1
 * Details on paths
   * Number of paths: 128
   * Number of rdf:type paths: 75 (58.59 %)
   * Number of other paths: 53 (41.41 %)
+
+## Details on sh:node constraints
+* Number of sh:node constraints (top-level and nested): 32
+  * On NodeShapes: 0
+  * On PropertyShapes: 32
+  * Nested (e.g., in sh:or): 0
+* Number of distinct shapes referenced by sh:node: 16

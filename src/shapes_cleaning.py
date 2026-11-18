@@ -26,7 +26,8 @@ NODE_CONSTRAINT_PREDICATES = {
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="shapes_cleaning", description="Removes rdf:type path constraints from shapes")
+    parser = argparse.ArgumentParser(prog="shapes_cleaning", description="Removes rdf:type path constraints and "
+                                                                        "sh:node constraints from shapes")
     parser.add_argument("--shapes", dest="shapes_file", help="SHACL shapes file", required=True)
     parser.add_argument("--output", dest="output", help="Output file", required=True)
     parser.add_argument("-l,--log-level", dest="log_level", help="Set the logging level", type=str,
@@ -84,6 +85,16 @@ def main():
 
         assert not list(g.triples((ps, None, None)))
         assert not list(g.triples((None, None, ps)))
+
+    # Remove sh:node constraints: QSE adds sh:node <NodeShape of C> next to sh:class C, which makes the validation of
+    # a node depend on the conformance of the nodes it links to (and so on along the graph). Each node is still
+    # validated against the NodeShapes of its own classes (sh:targetClass), and sh:class still checks the types of
+    # the nodes it links to
+    logger.info("Remove sh:node constraints")
+    node_triples = list(g.triples((None, SH.node, None)))
+    for t in tqdm.tqdm(node_triples):
+        g.remove(t)
+    logger.info(f"Removed {len(node_triples)} sh:node constraints")
 
     # Clean empty NodeShapes
     logger.info("Clean empty NodeShapes")
