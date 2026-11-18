@@ -1,7 +1,7 @@
 # SHACL shapes statistics:
 
 ## File statistics
-* Number of triples: 180809
+* Number of triples: 246082
 
 ## Shapes statistics
 * Total shapes: 8415
@@ -14,12 +14,12 @@
 
 ## Details on PropertyShapes constraints
 * List of constraints (top-level, not nested):
+  * http://www.w3.org/ns/shacl#minCount: 926
+  * http://www.w3.org/ns/shacl#or: 4906
   * http://www.w3.org/ns/shacl#in: 1949
   * http://www.w3.org/ns/shacl#class: 1538
   * http://www.w3.org/ns/shacl#maxCount: 1518
   * http://www.w3.org/ns/shacl#nodeKind: 1554
-  * http://www.w3.org/ns/shacl#or: 2963
-  * http://www.w3.org/ns/shacl#minCount: 926
 * Details on paths
   * Number of paths: 6466
   * Number of rdf:type paths: 1949 (30.14 %)
